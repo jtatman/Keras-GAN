@@ -5,7 +5,7 @@ from keras_contrib.layers.normalization.instancenormalization import InstanceNor
 from keras.layers import Input, Dense, Reshape, Flatten, Dropout, multiply, GaussianNoise
 from keras.layers import BatchNormalization, Activation, Embedding, ZeroPadding2D
 from keras.layers import Concatenate
-from keras.layers.advanced_activations import LeakyReLU
+from keras.layers import LeakyReLU
 from keras.layers.convolutional import UpSampling2D, Conv2D
 from keras.models import Sequential, Model
 from keras.optimizers import Adam
@@ -13,6 +13,9 @@ from keras import losses
 from keras.utils import to_categorical
 import keras.backend as K
 import scipy
+from PIL import Image
+import numpy
+
 
 import matplotlib.pyplot as plt
 
@@ -59,13 +62,12 @@ class CCGAN():
         self.combined = Model(masked_img , valid)
         self.combined.compile(loss=['mse'],
             optimizer=optimizer)
-
+    
 
     def build_generator(self):
-        """U-Net Generator"""
-
+        #"""U-Net Generator"""
         def conv2d(layer_input, filters, f_size=4, bn=True):
-            """Layers used during downsampling"""
+            #"""Layers used during downsampling"""
             d = Conv2D(filters, kernel_size=f_size, strides=2, padding='same')(layer_input)
             d = LeakyReLU(alpha=0.2)(d)
             if bn:
@@ -73,7 +75,7 @@ class CCGAN():
             return d
 
         def deconv2d(layer_input, skip_input, filters, f_size=4, dropout_rate=0):
-            """Layers used during upsampling"""
+            #"""Layers used during upsampling"""
             u = UpSampling2D(size=2)(layer_input)
             u = Conv2D(filters, kernel_size=f_size, strides=1, padding='same', activation='relu')(u)
             if dropout_rate:
@@ -148,7 +150,10 @@ class CCGAN():
         (X_train, y_train), (_, _) = mnist.load_data()
 
         # Rescale MNIST to 32x32
-        X_train = np.array([scipy.misc.imresize(x, [self.img_rows, self.img_cols]) for x in X_train])
+        #X_train = np.array([scipy.misc.imresize(x, [self.img_rows, self.img_cols]) for x in X_train])
+        #x_train_array = np.array([self.img_rows, self.img_cols])
+        X_train = np.array([np.array(Image.fromarray(x).resize([self.img_rows, self.img_cols])) for x in X_train])
+    
 
         # Rescale -1 to 1
         X_train = (X_train.astype(np.float32) - 127.5) / 127.5
