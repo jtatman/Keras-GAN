@@ -1,14 +1,16 @@
 from __future__ import print_function, division
 import scipy
+import tensorflow as tf
+
 
 from keras.datasets import mnist
 from keras_contrib.layers.normalization.instancenormalization import InstanceNormalization
-from keras.layers import Input, Dense, Reshape, Flatten, Dropout, Concatenate
+from tensorflow.python.keras.layers import Input, Dense, Reshape, Flatten, Dropout, Concatenate
 from keras.layers import BatchNormalization, Activation, ZeroPadding2D
-from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.convolutional import UpSampling2D, Conv2D
-from keras.models import Sequential, Model
-from keras.optimizers import Adam
+from tensorflow.python.keras.layers import LeakyReLU
+from tensorflow.python.keras.layers import UpSampling2D, Conv2D
+from tensorflow.python.keras.models import Sequential, Model
+from tensorflow.python.keras.optimizer_v2.adam import Adam
 import datetime
 import matplotlib.pyplot as plt
 import sys
@@ -25,7 +27,8 @@ class CycleGAN():
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
 
         # Configure data loader
-        self.dataset_name = 'apple2orange'
+        #self.dataset_name = 'apple2orange'
+        self.dataset_name = 'summer2winter_yosemite'
         self.data_loader = DataLoader(dataset_name=self.dataset_name,
                                       img_res=(self.img_rows, self.img_cols))
 

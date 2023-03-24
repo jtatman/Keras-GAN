@@ -1,6 +1,8 @@
 import scipy
 from glob import glob
 import numpy as np
+from PIL import Image
+
 
 class DataLoader():
     def __init__(self, dataset_name, img_res=(128, 128)):
@@ -17,12 +19,13 @@ class DataLoader():
         for img_path in batch_images:
             img = self.imread(img_path)
             if not is_testing:
-                img = scipy.misc.imresize(img, self.img_res)
-
+                #img = scipy.misc.imresize(img, self.img_res)
+                img = np.array(np.array(Image.fromarray(img).resize(self.img_res)))
                 if np.random.random() > 0.5:
                     img = np.fliplr(img)
             else:
-                img = scipy.misc.imresize(img, self.img_res)
+                #img = scipy.misc.imresize(img, self.img_res)
+                img = np.array(np.array(Image.fromarray(img).resize(self.img_res)))
             imgs.append(img)
 
         imgs = np.array(imgs)/127.5 - 1.
@@ -50,8 +53,14 @@ class DataLoader():
                 img_A = self.imread(img_A)
                 img_B = self.imread(img_B)
 
-                img_A = scipy.misc.imresize(img_A, self.img_res)
-                img_B = scipy.misc.imresize(img_B, self.img_res)
+                #img_A = scipy.misc.imresize(img_A, self.img_res)
+                #img_B = scipy.misc.imresize(img_B, self.img_res)
+                
+                img_A = Image.fromarray(img_A).resize(self.img_res)
+                img_A = np.array(img_A)
+
+                img_B = Image.fromarray(img_B).resize(self.img_res)
+                img_B = np.array(img_B)
 
                 if not is_testing and np.random.random() > 0.5:
                         img_A = np.fliplr(img_A)
@@ -67,9 +76,20 @@ class DataLoader():
 
     def load_img(self, path):
         img = self.imread(path)
-        img = scipy.misc.imresize(img, self.img_res)
+        #img = scipy.misc.imresize(img, self.img_res)
+        img = Image.fromarray(img).resize(self.img_res)
+        img = np.array(img)
+
         img = img/127.5 - 1.
         return img[np.newaxis, :, :, :]
 
     def imread(self, path):
-        return scipy.misc.imread(path, mode='RGB').astype(np.float)
+        img = Image.open(path)
+        img = img.convert("RGB")
+        # note 1: np.float is deprecated
+        # note 2: float explicit declaration is invalid for return processing - affects shape of tensor
+        #img_arr = np.array(img).astype(float)
+        img_arr = np.array(img)
+        return img_arr
+        # converted from scipy
+        #return scipy.misc.imread(path, mode='RGB').astype(np.float)
